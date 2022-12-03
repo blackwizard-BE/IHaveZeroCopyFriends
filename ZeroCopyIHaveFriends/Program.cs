@@ -11,13 +11,24 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
         static private IWebDriver zerocopy;
         static private Random random = new Random();
         static private char[] chars = "$%#@!*abcdefghijklmnopqrstuvwxyz1234567890?;:ABCDEFGHIJKLMNOPQRSTUVWXYZ^&".ToCharArray();
+
+        static private FileStream accounts = File.Open("ZeroCopyAccounts.txt", FileMode.Append);
+        static private StreamWriter writeaccounts = new StreamWriter(accounts);
         static void Main(string[] args)
         {
-           
-            CHAOS();
-
-
-
+            while (true)
+            {
+                
+                try
+                {
+                    CHAOS();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                
+            }
 
         }
 
@@ -26,6 +37,14 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
             
             tempmail = new ChromeDriver();
             tempmail.Url = "https://tempmailo.com/";
+            if (tempmail.PageSource.Contains("Rate limit exceeded! Try again later."))
+            {
+                Console.WriteLine("Rate limit.");
+                tempmail.Close();
+                tempmail.Quit();
+                Thread.Sleep(300000);
+                return;
+            }
             zerocopy = new ChromeDriver();
             zerocopy.Url = "https://app.zerocopy.be/ref/145037";
 
@@ -33,19 +52,31 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
 
             zerocopy.FindElement(By.Id("txtCreateAccountEmail")).SendKeys(getMail());
             String password = getRandomPassword();
+            SaveAccount(password,getMail());
             zerocopy.FindElement(By.Id("txtCreateAccountPassword")).SendKeys(password);
             zerocopy.FindElement(By.Id("txtCreateAccountPasswordRepeat")).SendKeys(password);
             zerocopy.FindElement(By.Id("chkCreateAccountPolicy")).Click();
             zerocopy.FindElement(By.Id("btnCreateAccount")).Click();
-
+            
+            zerocopy.Close();
+            zerocopy.Quit();
             bool found = false;
+            int timeout = 0;
             while (!found)
             {
+                if (timeout>=500)
+                {
+                    break;
+                }
                 try
                 {
                     if (tempmail.FindElement(By.ClassName("title")).Text.ToLower().Contains("zerocopy"))
                     {
                         found = true;
+                    }
+                    else
+                    {
+                        timeout++;
                     }
                 }
                 catch (Exception e)
@@ -57,9 +88,7 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
             tempmail.SwitchTo().Frame("fullmessage");
             tempmail.FindElement(By.PartialLinkText("Confirm email")).Click();
             Thread.Sleep(5000);
-            zerocopy.Close();
             tempmail.Close();
-            zerocopy.Quit();
             tempmail.Quit();
             
             
@@ -69,6 +98,12 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
         static String getMail()
         {
             return tempmail.FindElement(By.ClassName("vs-input")).GetAttribute("value");
+        }
+
+        static void SaveAccount(String password, String email)
+        {
+            writeaccounts.WriteLine($"password: {password} , e-mail: {email}");
+            writeaccounts.Flush();
         }
 
         static String getRandomPassword()
