@@ -1,9 +1,7 @@
-﻿using System;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.DevTools.V108.Page;
 
-namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project name.
+namespace ZeroCopyIHaveFriends
 {
     internal class Program
     {
@@ -18,7 +16,6 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
         {
             while (true)
             {
-                
                 try
                 {
                     CHAOS();
@@ -27,9 +24,7 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
                 {
                     Console.WriteLine(e);
                 }
-                
             }
-
         }
 
         static void CHAOS()
@@ -46,7 +41,7 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
                 return;
             }
             zerocopy = new ChromeDriver();
-            zerocopy.Url = "https://app.zerocopy.be/ref/145037";
+            zerocopy.Url = "https://app.zerocopy.be/ref/145795";
 
             zerocopy.FindElement(By.LinkText("Create an account")).Click();
 
@@ -56,6 +51,7 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
             zerocopy.FindElement(By.Id("txtCreateAccountPassword")).SendKeys(password);
             zerocopy.FindElement(By.Id("txtCreateAccountPasswordRepeat")).SendKeys(password);
             zerocopy.FindElement(By.Id("chkCreateAccountPolicy")).Click();
+            zerocopy.FindElement(By.ClassName("btn-dark")).Click();
             zerocopy.FindElement(By.Id("btnCreateAccount")).Click();
             
             zerocopy.Close();
@@ -90,8 +86,6 @@ namespace ZeroCopyIHaveFriends // Note: actual namespace depends on the project 
             Thread.Sleep(5000);
             tempmail.Close();
             tempmail.Quit();
-            
-            
             
         }
 
